@@ -4,6 +4,9 @@ import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import com.example.spacenewsapp.data.Result
+import com.example.spacenewsapp.data.local.RecentSearch
+import com.example.spacenewsapp.data.local.RecentSearchDao
+import com.example.spacenewsapp.data.local.SpaceNewsDatabase
 import com.example.spacenewsapp.data.remote.Article
 import com.example.spacenewsapp.data.remote.ArticleResponse
 import com.example.spacenewsapp.data.remote.ArticlesPaging
@@ -18,7 +21,8 @@ import java.io.IOException
 import javax.inject.Inject
 
 class ArticlesRepository @Inject constructor(
-    private val apiService: ApiService
+    private val apiService: ApiService,
+    private val recentSearchDao: RecentSearchDao
 ) {
 
     suspend fun getArticles(): List<ResultsItem> {
@@ -57,5 +61,9 @@ class ArticlesRepository @Inject constructor(
         return apiService.getArticles().results.filter {
             it.news_site.contains(filter, ignoreCase = true)
         }
+    }
+
+    suspend fun insertRecentSearch(recentSearch: RecentSearch) {
+        recentSearchDao.insertRecentSearch(recentSearch)
     }
 }

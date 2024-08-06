@@ -4,7 +4,9 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.room.Query
 import com.example.spacenewsapp.data.Result
+import com.example.spacenewsapp.data.local.RecentSearch
 import com.example.spacenewsapp.data.remote.Article
 import com.example.spacenewsapp.data.remote.NewsSiteResponse
 import com.example.spacenewsapp.data.remote.ResultsItem
@@ -28,8 +30,12 @@ class HomeViewModel @Inject constructor(
     private var _newsSite = mutableStateOf(HomeState())
     val newsSite: State<HomeState> = _newsSite
 
-    private val _isFound = MutableStateFlow(true)
-    val isFound : StateFlow<Boolean> get() = _isFound
+    private val _filter = MutableStateFlow("")
+    val filter : StateFlow<String> get() = _filter
+
+    private val _query = mutableStateOf("")
+    val query : State<String> get() = _query
+
 
     init {
         viewModelScope.launch {
@@ -60,6 +66,21 @@ class HomeViewModel @Inject constructor(
             } else {
                 _articles.value = articlesRepository.filterNewsSites(filter)
             }
+            _filter.value = filter
+
+        }
+    }
+
+    fun insertRecentSearch(query: String) {
+        viewModelScope.launch {
+            val recentSearch = RecentSearch(query)
+            articlesRepository.insertRecentSearch(recentSearch)
+        }
+    }
+
+    fun search(query: String) {
+        viewModelScope.launch {
+            _query.value = query
         }
     }
 

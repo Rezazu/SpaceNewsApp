@@ -9,7 +9,7 @@ import retrofit2.http.Path
 
 interface ApiService {
 
-    @GET("articles/")
+    @GET("articles/?limit=100&offset=100 ")
     suspend fun getArticles(
     ): ArticleResponse
 
