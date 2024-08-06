@@ -7,6 +7,7 @@ import com.example.spacenewsapp.data.Result
 import com.example.spacenewsapp.data.remote.Article
 import com.example.spacenewsapp.data.remote.ArticleResponse
 import com.example.spacenewsapp.data.remote.ArticlesPaging
+import com.example.spacenewsapp.data.remote.NewsSiteResponse
 import com.example.spacenewsapp.data.remote.ResultsItem
 import com.example.spacenewsapp.data.retrofit.ApiService
 import kotlinx.coroutines.flow.Flow
@@ -19,24 +20,10 @@ import javax.inject.Inject
 class ArticlesRepository @Inject constructor(
     private val apiService: ApiService
 ) {
-//     fun getArticles(): Flow<PagingData<ResultsItem>> {
-//        return Pager(
-//            config = PagingConfig(pageSize = 10),
-//            pagingSourceFactory = {
-//                ArticlesPaging(
-//                    apiService = apiService
-//                )
-//            }
-//        ).flow
-//    }
 
     suspend fun getArticles(): List<ResultsItem> {
         return apiService.getArticles().results
     }
-
-//    suspend fun getArticleById(news_id: String): Article {
-//        return apiService.getArticleById(id = news_id)
-//    }
 
     suspend fun getArticleById(id: String): Flow<Result<Article>> = flow {
         try {
@@ -47,6 +34,28 @@ class ArticlesRepository @Inject constructor(
             emit(Result.Error(e.localizedMessage ?: "An unexpected error, but a welcome one"))
         } catch (e: IOException) {
             emit(Result.Error("So unicivilized (No Connection!)"))
+        }
+    }
+
+    suspend fun getNewsSite(): Flow<Result<NewsSiteResponse>> = flow {
+        try {
+            emit(Result.Loading)
+            val newsSite = apiService.getNewsSite()
+            emit(Result.Success(newsSite))
+        } catch (e: HttpException) {
+            emit(Result.Error(e.localizedMessage ?: "An unexpected error, but a welcome one"))
+        } catch (e: IOException) {
+            emit(Result.Error("So unicivilized (No Connection!)"))
+        }
+    }
+
+    suspend fun getNewsSites(): NewsSiteResponse {
+        return apiService.getNewsSite()
+    }
+
+    suspend fun filterNewsSites(filter: String): List<ResultsItem> {
+        return apiService.getArticles().results.filter {
+            it.news_site.contains(filter, ignoreCase = true)
         }
     }
 }

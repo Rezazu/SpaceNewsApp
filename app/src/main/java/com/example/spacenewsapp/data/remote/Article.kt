@@ -4,20 +4,20 @@ import com.google.gson.annotations.SerializedName
 import kotlinx.coroutines.flow.MutableStateFlow
 
 data class Article(
-	val summary: String? = null,
+	val summary: String,
     @SerializedName("news_site")
-    val newsSite: String? = null,
-	val featured: Boolean? = null,
+    val newsSite: String,
+	val featured: Boolean,
     @SerializedName("updated_at")
-    val updatedAt: String? = null,
+    val updatedAt: String,
 	@SerializedName("image_url")
-	val imageUrl: String? = null,
-	val id: Int? = null,
-	val title: String? = null,
-    @SerializedName("publised_at")
-    val publishedAt: String? = null,
-	val url: String? = null,
-	val launches: List<Any?>? = null,
-	val events: List<Any?>? = null
+	val imageUrl: String,
+	val id: Int,
+	val title: String,
+    @SerializedName("published_at")
+    val publishedAt: String,
+	val url: String,
+	val launches: List<Any?>,
+	val events: List<Any?>
 )
 
