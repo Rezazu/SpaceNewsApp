@@ -54,6 +54,7 @@ import androidx.room.Query
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.example.spacenewsapp.R
+import com.example.spacenewsapp.data.local.RecentSearch
 import com.example.spacenewsapp.data.remote.ResultsItem
 import com.example.spacenewsapp.ui.Screen
 import com.example.spacenewsapp.ui.theme.SpaceNewsAppTheme
@@ -66,9 +67,10 @@ fun HomeScreen(
 ) {
 
     val articles by viewModel.articles.collectAsState(initial = emptyList())
-    val newsSites by viewModel.newsSite
+    val recentSearch by viewModel.getAllRecentSearch().collectAsState(initial = emptyList())
     val filter by viewModel.filter.collectAsState()
-    val query by viewModel.query
+    val newsSites by viewModel.newsSite
+    val query by viewModel.query.collectAsState(initial = "")
 
     Column(
         modifier = Modifier
@@ -76,8 +78,9 @@ fun HomeScreen(
     ) {
         SearchBar(
             query = query,
-            onSearch = viewModel::insertRecentSearch,
-            onQueryChange = viewModel::search,
+            onSearch = viewModel::onSearch,
+            onQueryChange = viewModel::onQueryChanged,
+            recentSearch = recentSearch
         )
         Text(
             text = "Filter News Site",
@@ -113,23 +116,19 @@ fun SearchBar(
     query: String,
     onSearch: (String) -> Unit,
     onQueryChange: (String) -> Unit,
+    recentSearch: List<RecentSearch>,
     modifier: Modifier = Modifier
 ) {
     var active by rememberSaveable { mutableStateOf(false) }
-    val items = remember {
-        mutableStateListOf(
-            "Android",
-            "Studio"
-        )
+    var text by remember {
+        mutableStateOf(query)
     }
-
     androidx.compose.material3.SearchBar(
         query = query,
         onQueryChange = onQueryChange,
         onSearch = {
             onSearch(query)
             active = false
-
         },
         active = active,
         onActiveChange = { active = it },
@@ -148,14 +147,24 @@ fun SearchBar(
             .fillMaxWidth()
             .heightIn(min = 48.dp),
         content = {
-            items.forEach {
+            recentSearch.forEach {
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier
                         .fillMaxWidth()
+                        .clickable {
+                            onSearch(it.query)
+                            active = false
+                        }
                 ) {
+                    Image(
+                        painter = painterResource(id = R.drawable.ic_recent),
+                        contentDescription = null,
+                        modifier = Modifier
+                            .size(24.dp)
+                    )
                     Text(
-                        text = it,
+                        text = it.query,
                         modifier = Modifier
                             .padding(16.dp)
                     )

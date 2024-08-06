@@ -3,6 +3,7 @@ package com.example.spacenewsapp.data.repository
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
+import androidx.room.Query
 import com.example.spacenewsapp.data.Result
 import com.example.spacenewsapp.data.local.RecentSearch
 import com.example.spacenewsapp.data.local.RecentSearchDao
@@ -41,18 +42,6 @@ class ArticlesRepository @Inject constructor(
         }
     }
 
-    suspend fun getNewsSite(): Flow<Result<NewsSiteResponse>> = flow {
-        try {
-            emit(Result.Loading)
-            val newsSite = apiService.getNewsSite()
-            emit(Result.Success(newsSite))
-        } catch (e: HttpException) {
-            emit(Result.Error(e.localizedMessage ?: "An unexpected error, but a welcome one"))
-        } catch (e: IOException) {
-            emit(Result.Error("So unicivilized (No Connection!)"))
-        }
-    }
-
     suspend fun getNewsSites(): NewsSiteResponse {
         return apiService.getNewsSite()
     }
@@ -63,7 +52,17 @@ class ArticlesRepository @Inject constructor(
         }
     }
 
+    suspend fun searchArticle(query: String): List<ResultsItem> {
+        return apiService.getArticles().results.filter {
+            it.title.contains(query, ignoreCase = true)
+        }
+    }
+
     suspend fun insertRecentSearch(recentSearch: RecentSearch) {
         recentSearchDao.insertRecentSearch(recentSearch)
+    }
+
+    fun getAllRecentSearch(): Flow<List<RecentSearch>> {
+        return recentSearchDao.getAllRecentSearch()
     }
 }

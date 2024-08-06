@@ -13,6 +13,7 @@ import com.example.spacenewsapp.data.remote.ResultsItem
 import com.example.spacenewsapp.data.repository.ArticlesRepository
 import com.example.spacenewsapp.ui.detail.DetailState
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.onEach
@@ -33,9 +34,8 @@ class HomeViewModel @Inject constructor(
     private val _filter = MutableStateFlow("")
     val filter : StateFlow<String> get() = _filter
 
-    private val _query = mutableStateOf("")
-    val query : State<String> get() = _query
-
+    private val _query = MutableStateFlow("")
+    val query : StateFlow<String> get() = _query
 
     init {
         viewModelScope.launch {
@@ -71,37 +71,23 @@ class HomeViewModel @Inject constructor(
         }
     }
 
-    fun insertRecentSearch(query: String) {
+    fun onSearch(query: String) {
         viewModelScope.launch {
+            val searchResult = articlesRepository.searchArticle(query)
             val recentSearch = RecentSearch(query)
+            _articles.value = searchResult
             articlesRepository.insertRecentSearch(recentSearch)
         }
     }
 
-    fun search(query: String) {
-        viewModelScope.launch {
-            _query.value = query
-        }
+    fun onQueryChanged(query: String) {
+        _query.value = query
     }
 
-//    fun getNewsSite(){
-//        viewModelScope.launch {
-//            articlesRepository.getNewsSite().onEach { result ->
-//                when(result) {
-//                    is Result.Success -> {
-//                        _newsSite.value = HomeState(newsSite = result.data.newsSite)
-//                    }
-//                    is Result.Error -> {
-//                        _newsSite.value = HomeState(error =
-//                        "An unexpected error, but a welcome one")
-//                    }
-//                    is Result.Loading -> {
-//                        _newsSite.value = HomeState(isLoading = true)
-//                    }
-//                }
-//            }
-//        }
-//    }
+    fun getAllRecentSearch(): Flow<List<RecentSearch>> {
+        return articlesRepository.getAllRecentSearch()
+    }
+
 }
 
 data class HomeState (
