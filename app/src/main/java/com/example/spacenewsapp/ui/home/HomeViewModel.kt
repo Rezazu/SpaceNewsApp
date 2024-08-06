@@ -15,7 +15,7 @@ class HomeViewModel @Inject constructor(
     private val articlesRepository: ArticlesRepository
 ):ViewModel() {
 
-    private val _articles = MutableStateFlow<List<ResultsItem>>(emptyList())
+    private var _articles = MutableStateFlow<List<ResultsItem>>(emptyList())
     val articles: StateFlow<List<ResultsItem>> get() = _articles
 
     fun getArticles(){

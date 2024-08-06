@@ -25,21 +25,22 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.paging.compose.collectAsLazyPagingItems
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.example.spacenewsapp.data.remote.ResultsItem
+import com.example.spacenewsapp.ui.Screen
 import com.example.spacenewsapp.ui.theme.SpaceNewsAppTheme
 
 @Composable
 fun HomeScreen(
-    modifier: Modifier = Modifier,
-    viewModel: HomeViewModel,
+    viewModel: HomeViewModel = hiltViewModel(),
     navController: NavController
 ) {
 
-    val articles by viewModel.articles.collectAsState()
+    val articles by viewModel.articles.collectAsState(initial = emptyList())
 
     Column(
         modifier = Modifier
@@ -53,7 +54,7 @@ fun HomeScreen(
                 articles[it].let { article ->
                     ArticleItem(
                         article = article,
-                        onItemClick = {}
+                        onItemClick = { navController.navigate(Screen.DetailScreen.route + "/${article.id}") }
                     )
                 }
             }
@@ -75,7 +76,7 @@ fun ArticleItem(
             .height(128.dp)
             .padding(8.dp)
             .background(MaterialTheme.colorScheme.background)
-            .clickable { onItemClick }
+            .clickable { onItemClick(article) }
     ) {
         Row (
             modifier = Modifier

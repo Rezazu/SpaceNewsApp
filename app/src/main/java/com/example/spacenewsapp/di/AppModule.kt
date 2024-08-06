@@ -2,8 +2,6 @@ package com.example.spacenewsapp.di
 
 import com.example.spacenewsapp.data.repository.ArticlesRepository
 import com.example.spacenewsapp.data.retrofit.ApiService
-import com.example.spacenewsapp.domain.use_case.GetArticles
-import com.example.spacenewsapp.domain.use_case.UseCases
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -45,4 +43,5 @@ object AppModule {
             .build()
             .create(ApiService::class.java)
     }
+
 }
